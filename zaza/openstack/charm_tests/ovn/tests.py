@@ -71,3 +71,11 @@ class ChassisCharmOperationTest(BaseCharmOperationTest):
         cls.services = [
             'ovn-controller',
         ]
+
+
+class OVSOVNMigrationTest(test_utils.BaseCharmTest):
+    """OVS to OVN migration tests."""
+
+    def test_noop(self):
+        """placeholder."""
+        pass
