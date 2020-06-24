@@ -836,10 +836,29 @@ class NeutronNetworkingTest(NeutronNetworkingBase):
 
     def test_instances_have_networking(self):
         """Validate North/South and East/West networking."""
-        self.launch_guests()
         instance_1, instance_2 = self.retrieve_guests(self.nova_client)
+        if not all([instance_1, instance_2]):
+            self.launch_guests()
+            instance_1, instance_2 = self.retrieve_guests(self.nova_client)
         self.check_connectivity(instance_1, instance_2)
         self.run_tearDown = True
+
+
+class NoTearDownNeutronNetworkingTest(NeutronNetworkingTest):
+    """Ensure that openstack instances have valid networking."""
+
+    def test_instances_have_networking(self):
+        """Ensure that openstack instances have valid networking.
+
+        This incarnation of the test will not tear down resources so that
+        you can run it multiple times on the same set of instances.
+
+        Useful for morphing a deployment and then validating connectivity for
+        existing instances afterwards.
+        """
+        super(NoTearDownNeutronNetworkingTest,
+              self).test_instances_have_networking()
+        self.run_tearDown = False
 
 
 class NeutronNetworkingVRRPTests(NeutronNetworkingBase):
