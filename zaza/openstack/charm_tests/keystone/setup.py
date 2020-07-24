@@ -41,15 +41,20 @@ def wait_for_cacert(model_name=None):
     :type model_name: str
     """
     logging.info("Waiting for cacert")
+    model_aliases = zaza.model.get_juju_model_aliases()
+    if not model_name:
+        model_name = zaza.model.get_juju_model()
+    apps_states = lifecycle_utils.get_apps_states(
+        model_name,
+        model_aliases)
     zaza.model.block_until_file_has_contents(
         'keystone',
         openstack_utils.KEYSTONE_REMOTE_CACERT,
         'CERTIFICATE',
         model_name=model_name)
     zaza.model.block_until_all_units_idle(model_name=model_name)
-    test_config = lifecycle_utils.get_charm_config(fatal=False)
     zaza.model.wait_for_application_states(
-        states=test_config.get('target_deploy_status', {}),
+        states=apps_states,
         model_name=model_name)
 
 

@@ -134,10 +134,15 @@ def auto_initialize(cacert=None, validation_application='keystone', wait=True):
         allowed_domains='openstack.local')
 
     if wait:
+        model_aliases = zaza.model.get_juju_model_aliases()
+        model_name = zaza.model.get_juju_model()
+        apps_states = lifecycle_utils.get_apps_states(
+            model_name,
+            model_aliases
+        )
         zaza.model.wait_for_agent_status()
-        test_config = lifecycle_utils.get_charm_config(fatal=False)
         zaza.model.wait_for_application_states(
-            states=test_config.get('target_deploy_status', {}))
+            states=apps_states)
 
     if validation_application:
         validate_ca(cacertificate, application=validation_application)

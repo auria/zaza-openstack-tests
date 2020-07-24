@@ -86,13 +86,12 @@ def configure_octavia():
                  'client/server authentication '
                  '(client being the ``Amphorae`` load balancer instances)')
 
-    # Our expected workload status will change after we have configured the
-    # certificates
-    test_config = zaza.charm_lifecycle.utils.get_charm_config()
-    del test_config['target_deploy_status']['octavia']
-
     _singleton = zaza.openstack.charm_tests.test_utils.OpenStackBaseTest()
     _singleton.setUpClass()
+    # Our expected workload status will change after we have configured the
+    # certificates
+    if _singleton.apps_states.get('octavia'):
+        del _singleton.apps_states['octavia']
     with _singleton.config_change(cert_config, cert_config):
         # wait for configuration to be applied then return
         pass

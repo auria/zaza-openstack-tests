@@ -23,7 +23,6 @@ import zaza.model
 import zaza.openstack.utilities.exceptions as zaza_exceptions
 import zaza.utilities.juju as juju_utils
 import zaza.openstack.utilities.openstack as openstack_utils
-import zaza.charm_lifecycle.utils as lifecycle_utils
 import zaza.openstack.charm_tests.test_utils as test_utils
 from zaza.openstack.charm_tests.keystone import (
     BaseKeystoneTest,
@@ -443,9 +442,8 @@ class LdapTests(BaseKeystoneTest):
             logging.info(
                 'Waiting for users to become available in keystone...'
             )
-            test_config = lifecycle_utils.get_charm_config(fatal=False)
             zaza.model.wait_for_application_states(
-                states=test_config.get("target_deploy_status", {})
+                states=self.apps_states
             )
 
             with self.v3_keystone_preferred():

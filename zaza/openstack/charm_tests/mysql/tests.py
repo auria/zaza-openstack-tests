@@ -406,9 +406,8 @@ class PerconaClusterColdStartTest(PerconaClusterBaseTest):
         logging.info("Wait for application states ...")
         for unit in zaza.model.get_units(self.application):
             zaza.model.run_on_unit(unit.entity_id, "hooks/update-status")
-        test_config = lifecycle_utils.get_charm_config(fatal=False)
         zaza.model.wait_for_application_states(
-            states=test_config.get("target_deploy_status", {}))
+            states=self.apps_states)
 
 
 class PerconaClusterScaleTests(PerconaClusterBaseTest):
@@ -602,9 +601,8 @@ class MySQLInnoDBClusterColdStartTest(MySQLBaseTest):
         logging.info("Wait for application states ...")
         for unit in zaza.model.get_units(self.application):
             zaza.model.run_on_unit(unit.entity_id, "hooks/update-status")
-        test_config = lifecycle_utils.get_charm_config(fatal=False)
         zaza.model.wait_for_application_states(
-            states=test_config.get("target_deploy_status", {}))
+            states=self.apps_states)
 
 
 class MySQL8MigrationTests(MySQLBaseTest):
@@ -721,9 +719,8 @@ class MySQL8MigrationTests(MySQLBaseTest):
             "Set PXC Strict Mode ENFORCING action failed: {}"
             .format(action.data))
         logging.info("Wait for application states ...")
-        test_config = lifecycle_utils.get_charm_config(fatal=False)
         zaza.model.wait_for_application_states(
-            states=test_config.get("target_deploy_status", {}))
+            states=self.apps_states)
 
 
 class MySQLInnoDBClusterScaleTest(MySQLBaseTest):
@@ -735,7 +732,7 @@ class MySQLInnoDBClusterScaleTest(MySQLBaseTest):
         super().setUpClass()
         cls.application = "mysql-innodb-cluster"
         cls.test_config = lifecycle_utils.get_charm_config(fatal=False)
-        cls.states = cls.test_config.get("target_deploy_status", {})
+        cls.states = cls.apps_states
 
     def test_800_remove_leader(self):
         """Remove leader node.
