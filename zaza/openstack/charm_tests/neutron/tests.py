@@ -59,8 +59,7 @@ class NeutronPluginApiSharedTests(test_utils.OpenStackBaseTest):
             return
         conf_file = "/etc/neutron/dhcp_agent.ini"
         expected = {"DEFAULT": {"ovs_use_veth": ["False"]}}
-        test_config = zaza.charm_lifecycle.utils.get_charm_config(fatal=False)
-        states = test_config.get("target_deploy_status", {})
+        states = self.apps_states
         alt_states = copy.deepcopy(states)
         alt_states[self.application_name] = {
             "workload-status": "blocked",

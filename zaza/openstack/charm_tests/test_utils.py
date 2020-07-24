@@ -135,6 +135,9 @@ class BaseCharmTest(unittest.TestCase):
             cls.application_name,
             model_name=cls.model_name)
         logging.debug('Leader unit is {}'.format(cls.lead_unit))
+        cls.apps_states = lifecycle_utils.get_apps_states(
+            cls.model_name,
+            cls.model_aliases)
 
     def config_current(self, application_name=None, keys=None):
         """Get Current Config of an application normalized into key-values.
@@ -240,7 +243,7 @@ class BaseCharmTest(unittest.TestCase):
                 'Waiting for units to reach target states')
             model.wait_for_application_states(
                 model_name=self.model_name,
-                states=self.test_config.get('target_deploy_status', {}))
+                states=self.apps_states)
             # TODO: Optimize with a block on a specific application until idle.
             model.block_until_all_units_idle()
 
@@ -256,7 +259,7 @@ class BaseCharmTest(unittest.TestCase):
             'Waiting for units to reach target states')
         model.wait_for_application_states(
             model_name=self.model_name,
-            states=self.test_config.get('target_deploy_status', {}))
+            states=self.apps_states)
         # TODO: Optimize with a block on a specific application until idle.
         model.block_until_all_units_idle()
 

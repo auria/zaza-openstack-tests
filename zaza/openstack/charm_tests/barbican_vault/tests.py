@@ -14,7 +14,6 @@
 
 """Encapsulate barbican-vault testing."""
 
-import zaza
 import zaza.openstack.charm_tests.vault.tests as vault_tests
 
 
@@ -28,6 +27,6 @@ class BarbicanVaultUnsealVault(vault_tests.UnsealVault):
 
     def test_unseal(self):
         """Unseal vault, update barbican-vault deploy status expectations."""
-        test_config = zaza.charm_lifecycle.utils.get_charm_config()
-        del test_config['target_deploy_status']['barbican-vault']
-        super().test_unseal(test_config)
+        if self.apps_states.get('barbican-vault'):
+            del self.apps_states['barbican-vault']
+        super().test_unseal(self.apps_states)

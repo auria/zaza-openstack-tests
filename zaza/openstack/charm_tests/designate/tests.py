@@ -27,7 +27,6 @@ import zaza.openstack.utilities.juju as zaza_juju
 import zaza.openstack.charm_tests.test_utils as test_utils
 import zaza.openstack.utilities.openstack as openstack_utils
 import zaza.openstack.charm_tests.designate.utils as designate_utils
-import zaza.charm_lifecycle.utils as lifecycle_utils
 
 
 class BaseDesignateTest(test_utils.OpenStackBaseTest):
@@ -274,8 +273,7 @@ class DesignateBindExpand(BaseDesignateTest):
 
     def test_expand_and_contract(self):
         """Test expanding and shrinking bind."""
-        test_config = lifecycle_utils.get_charm_config(fatal=False)
-        states = test_config.get("target_deploy_status", {})
+        states = self.apps_states
         if not self.post_xenial_queens:
             raise unittest.SkipTest("Test not supported before Queens")
 

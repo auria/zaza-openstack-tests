@@ -39,7 +39,11 @@ class BaseVaultTest(test_utils.OpenStackBaseTest):
     @classmethod
     def setUpClass(cls):
         """Run setup for Vault tests."""
+        cls.model_aliases = zaza.model.get_juju_model_aliases()
         cls.model_name = zaza.model.get_juju_model()
+        cls.apps_states = lifecycle_utils.get_apps_states(
+            cls.model_name,
+            cls.model_aliases)
         cls.lead_unit = zaza.model.get_lead_unit_name(
             "vault", model_name=cls.model_name)
         cls.clients = vault_utils.get_clients()
@@ -97,18 +101,18 @@ class UnsealVault(BaseVaultTest):
         """Run setup for UnsealVault class."""
         super(UnsealVault, cls).setUpClass()
 
-    def test_unseal(self, test_config=None):
+    def test_unseal(self, apps_states=None):
         """Unseal Vault.
 
         :param test_config: (Optional) Zaza test config
         :type test_config: charm_lifecycle.utils.get_charm_config()
         """
         vault_utils.run_charm_authorize(self.vault_creds['root_token'])
-        if not test_config:
-            test_config = lifecycle_utils.get_charm_config()
-        del test_config['target_deploy_status']['vault']
-        zaza.model.wait_for_application_states(
-            states=test_config.get('target_deploy_status', {}))
+        if not apps_states:
+            apps_states = self.apps_states
+        if apps_states.get('vault'):
+            del apps_states['vault']
+        zaza.model.wait_for_application_states(states=apps_states)
 
 
 class VaultTest(BaseVaultTest):
@@ -148,14 +152,14 @@ class VaultTest(BaseVaultTest):
             root_ca=cacert,
             allowed_domains='openstack.local')
 
-        test_config = lifecycle_utils.get_charm_config()
-        del test_config['target_deploy_status']['vault']
+        if self.apps_states.get('vault'):
+            del self.apps_states['vault']
         zaza.model.block_until_file_has_contents(
             'keystone',
             zaza.openstack.utilities.openstack.KEYSTONE_REMOTE_CACERT,
             cacert.decode().strip())
         zaza.model.wait_for_application_states(
-            states=test_config.get('target_deploy_status', {}))
+            states=self.apps_states)
         ip = zaza.model.get_app_ips(
             'keystone')[0]
         with tempfile.NamedTemporaryFile(mode='w') as fp:
